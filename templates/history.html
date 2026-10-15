@@ -1,0 +1,72 @@
+```html
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Your Analysis History</h2>
+
+{% if reports %}
+    {% for r in reports %}
+        <div class="card">
+            <p><strong>Target Role:</strong> {{ r.get("user_goal", "Not specified") }}</p>
+
+            <p><strong>Resume Preview:</strong></p>
+            <p>{{ r.get("resume_text", "")[:150] }}{% if r.get("resume_text", "")|length > 150 %}...{% endif %}</p>
+
+            <p><strong>Date:</strong> {{ r.get("created_at", "Unknown") }}</p>
+            <hr>
+
+            {% set analysis = r.get("result", {}) %}
+
+            {% if analysis is mapping and not analysis.get("error") %}
+
+                <h3>Skills</h3>
+                <ul>
+                    {% for s in analysis.get("skills", []) %}
+                        <li>{{ s }}</li>
+                    {% else %}
+                        <li>No skills listed.</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Missing Skills</h3>
+                <ul>
+                    {% for s in analysis.get("missing_skills", []) %}
+                        <li>{{ s }}</li>
+                    {% else %}
+                        <li>No missing skills listed.</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Roadmap</h3>
+                <ul>
+                    {% for s in analysis.get("roadmap", analysis.get("Roadmap", [])) %}
+                        <li>{{ s }}</li>
+                    {% else %}
+                        <li>No roadmap available.</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Interview Questions</h3>
+                <ul>
+                    {% for q in analysis.get("interview_questions", []) %}
+                        <li>{{ q }}</li>
+                    {% else %}
+                        <li>No interview questions available.</li>
+                    {% endfor %}
+                </ul>
+
+            {% elif analysis is mapping %}
+                <p style="color: red;">Analysis error: {{ analysis.get("error") }}</p>
+            {% else %}
+                <p>No structured analysis is available for this report.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You haven't analyzed any resumes yet.</p>
+{% endif %}
+
+<a href="/dashboard">Back to Dashboard</a>
+
+{% endblock %}
+```
